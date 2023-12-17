@@ -36,11 +36,8 @@ jobs:
     - name: Build CLI exe
       run: dotnet publish MMR.CLI\MMR.CLI.csproj -c Release -o build -r win-x64 --no-self-contained
 
-    - name: Create output directory
-      run: md build\output
-
     - name: Set sha-short variable
-      run: echo "sha_short=$(git rev-parse --short HEAD)" >> $env:GITHUB_ENV
+      run: echo "sha_short=$("${{ github.sha }}".SubString(0, 7))" >> $env:GITHUB_ENV
 
     - name: Package
       uses: actions/upload-artifact@v3
