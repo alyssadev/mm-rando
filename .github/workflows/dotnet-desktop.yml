@@ -30,9 +30,6 @@ jobs:
         dotnet test MMR.Randomizer.Tests
 #       dotnet test MMR.Yaz.Tests
 
-    - name: Set commit sha variable
-      run: echo "suffix=dev-$("${{ github.sha }}".SubString(0, 7))" >> $env:GITHUB_ENV
-
     - name: Set variables
       run: |
         $xml = [xml](Get-Content MMR.Randomizer\MMR.Randomizer.csproj)
