@@ -30,12 +30,19 @@ jobs:
         dotnet test MMR.Randomizer.Tests
 #       dotnet test MMR.Yaz.Tests
 
-    - name: Build release exe
+    - name: Build UI exe
       run: dotnet publish MMR.UI\MMR.UI.csproj -c Release -o build -r win-x64 --no-self-contained
 
+    - name: Build CLI exe
+      run: dotnet publish MMR.CLI\MMR.CLI.csproj -c Release -o build -r win-x64 --no-self-contained
+
+    - name: Create output directory
+      run: md build\output
+
+    - name: Set sha-short variable
+      run: echo "::set-env name=sha_short::$(git rev-parse --short HEAD)"
     - name: Package
       uses: actions/upload-artifact@v3
       with:
-        name: MM Randomizer
+        name: MM-Randomizer-dev-${{ env.sha_short }}
         path: build/
-        retention-days: 28
