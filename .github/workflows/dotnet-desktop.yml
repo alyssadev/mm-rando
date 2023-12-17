@@ -30,17 +30,22 @@ jobs:
         dotnet test MMR.Randomizer.Tests
 #       dotnet test MMR.Yaz.Tests
 
+    - name: Set commit sha variable
+      run: echo "short=$("${{ github.sha }}".SubString(0, 7))" >> $env:GITHUB_ENV
+
+    - name: Set version variable
+      run: |
+        $xml = [xml](Get-Content MMR.Randomizer\MMR.Randomizer.csproj)
+        echo "version=$($xml.Project.PropertyGroup.VersionPrefix)-dev-${{ env.short }}" >> $env:GITHUB_ENV
+
     - name: Build UI exe
-      run: dotnet publish MMR.UI\MMR.UI.csproj -c Release -o build -r win-x64 --no-self-contained
+      run: dotnet publish MMR.UI\MMR.UI.csproj -p:VersionSuffix="dev-${{ env.short }}" -c Release -o build -r win-x64 --no-self-contained
 
     - name: Build CLI exe
-      run: dotnet publish MMR.CLI\MMR.CLI.csproj -c Release -o build -r win-x64 --no-self-contained
-
-    - name: Set sha-short variable
-      run: echo "sha_short=$("${{ github.sha }}".SubString(0, 7))" >> $env:GITHUB_ENV
+      run: dotnet publish MMR.CLI\MMR.CLI.csproj -p:VersionSuffix="dev-${{ env.short }}" -c Release -o build -r win-x64 --no-self-contained
 
     - name: Package
       uses: actions/upload-artifact@v3
       with:
-        name: MM-Randomizer-dev-${{ env.sha_short }}
+        name: MM-Randomizer-v${{ env.version }}
         path: build/
