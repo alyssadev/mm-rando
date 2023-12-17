@@ -31,18 +31,21 @@ jobs:
 #       dotnet test MMR.Yaz.Tests
 
     - name: Set commit sha variable
-      run: echo "short=$("${{ github.sha }}".SubString(0, 7))" >> $env:GITHUB_ENV
+      run: echo "suffix=dev-$("${{ github.sha }}".SubString(0, 7))" >> $env:GITHUB_ENV
 
-    - name: Set version variable
+    - name: Set variables
       run: |
         $xml = [xml](Get-Content MMR.Randomizer\MMR.Randomizer.csproj)
-        echo "version=$($xml.Project.PropertyGroup.VersionPrefix)-dev-${{ env.short }}" >> $env:GITHUB_ENV
+        $prefix = "$($xml.Project.PropertyGroup.VersionPrefix)".TrimEnd()
+        $suffix = "dev-$("${{ github.sha }}".SubString(0, 7))"
+        echo "version=$prefix-$suffix" >> $env:GITHUB_ENV
+        echo "suffix=$suffix" >> $env:GITHUB_ENV
 
     - name: Build UI exe
-      run: dotnet publish MMR.UI\MMR.UI.csproj -p:VersionSuffix="dev-${{ env.short }}" -c Release -o build -r win-x64 --no-self-contained
+      run: dotnet publish MMR.UI\MMR.UI.csproj -p:VersionSuffix="${{ env.suffix }}" -c Release -o build -r win-x64 --no-self-contained
 
     - name: Build CLI exe
-      run: dotnet publish MMR.CLI\MMR.CLI.csproj -p:VersionSuffix="dev-${{ env.short }}" -c Release -o build -r win-x64 --no-self-contained
+      run: dotnet publish MMR.CLI\MMR.CLI.csproj -p:VersionSuffix="${{ env.suffix }}" -c Release -o build -r win-x64 --no-self-contained
 
     - name: Package
       uses: actions/upload-artifact@v3
