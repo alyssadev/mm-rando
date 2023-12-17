@@ -40,7 +40,8 @@ jobs:
       run: md build\output
 
     - name: Set sha-short variable
-      run: echo "::set-env name=sha_short::$(git rev-parse --short HEAD)"
+      run: echo "sha_short=$(git rev-parse --short HEAD)" >> $env:GITHUB_ENV
+
     - name: Package
       uses: actions/upload-artifact@v3
       with:
